@@ -10,6 +10,12 @@ pub enum DstVersion {
     Unknow(u32),
 }
 
+pub enum DstStatus<'a > {
+    Installed,
+    NoInstalled,
+    Incomplete(Vec<&'a Path>),
+}
+
 pub trait DstServer {
     /// the version info of `DstServer`
     fn dstversion(&self) -> Result<DstVersion> {
@@ -29,4 +35,7 @@ pub trait DstServer {
 
     /// folder (where to install dst)
     fn folder(&self) -> &Path;
+
+    /// status
+    fn status(&self) -> DstStatus;
 }
