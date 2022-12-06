@@ -1,41 +1,64 @@
+#![allow(unused)]
+
 //! DSTSERVER Related Modules
 
 use anyhow::Result;
-use std::{fs::read_to_string, path::Path};
+use std::{
+    fmt::Display,
+    fs::read_to_string,
+    path::{Path, PathBuf},
+};
 
-pub enum DstVersion {
-    Release(u32),
-    Test(u32),
+pub enum DstVersionType {
+    Release,
+    Test,
     /// Unknow yet
-    Unknow(u32),
+    Unknow,
 }
 
-pub enum DstStatus<'a > {
+impl Display for DstVersionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Release => write!(f, "Release"),
+            Self::Test => write!(f, "Test"),
+            _ => write!(f, "Unknow"),
+        }
+    }
+}
+
+pub enum VersionStatus {
+    Outdate,
+    Newest,
+    Unknow,
+}
+
+pub struct DstVersionInfo {
+    vtype: DstVersionType,
+    number: Option<u32>,
+}
+
+pub enum DstStatus {
     Installed,
     NoInstalled,
-    Incomplete(Vec<&'a Path>),
+    Broken(Vec<PathBuf>),
+    Unknow,
 }
 
-pub trait DstServer {
-    /// the version info of `DstServer`
-    fn dstversion(&self) -> Result<DstVersion> {
-        let content = read_to_string(self.version_txt_path())?;
-        let num: u32 = content.trim().parse()?;
-        Ok(DstVersion::Unknow(num))
+impl DstStatus {
+    pub fn is_ready(&self) -> bool {
+        matches!(self, Self::Installed)
     }
+}
 
-    /// the bin_32 path
-    fn bin_32(&self) -> &Path;
+pub struct DstServerPath {
+    /// where to install
+    dir_path: PathBuf,
+    bin_32: PathBuf,
+    bin_64: PathBuf,
+    version_txt: PathBuf,
+}
 
-    /// the bin_64 path
-    fn bin_64(&self) -> &Path;
-
-    /// version.txt file_path
-    fn version_txt_path(&self) -> &Path;
-
-    /// folder (where to install dst)
-    fn folder(&self) -> &Path;
-
-    /// status
-    fn status(&self) -> DstStatus;
+pub struct DstServer {
+    path: DstServerPath,
+    status: DstStatus,
 }
