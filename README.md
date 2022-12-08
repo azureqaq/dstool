@@ -2,6 +2,8 @@
 
 Don't Starve Together Dedicated Server Tools by [Rust-lang](https://www.rust-lang.org/) 🦀
 
+Azureqaq's Blog: [3moredays](https://www.3moredays.com/)
+
 ## Under development
 
 **Not completed**
